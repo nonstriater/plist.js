@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <title>Fly It Remotely! - The simplest way to beta testing your iOS apps.</title>
+  <script type="text/javascript" src="plist.js"></script>
+  <script type="text/javascript">
+    function fileinfo(files) {
+      var f=files[0];
+      
+      console.log(f.name,f.size, f.type, f.lastModifiedDate.toLocaleDateString());
+
+      var plist=getPlist(f,function(obj){
+          console.log(obj);
+      });
+      
+
+      // var r = new FileReader();
+      // r.onload = function(){ 
+        
+      //   var s=r.result;
+      //   console.log(r.result); 
+
+        
+
+      // };
+      // //r.readAsArrayBuffer(f);
+      // r.readAsBinaryString(f);
+        
+    }
+
+  </script>
+</head>
+<body>
+  <div class="container">
+    <input type="file" id="selectFile" name="file" onchange="fileinfo(this.files)"/>
+  </div>
+
+</body>
+</html>
