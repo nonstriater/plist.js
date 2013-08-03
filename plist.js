@@ -9,7 +9,9 @@
             
             var s="";
             for (var i = 0; i < length; i++) {
-                s+=buffer[offset+i].toString(16).toUpperCase();
+                var c=buffer[offset+i].toString(16).toUpperCase();
+                if (c.length==1) {c="0"+c};
+                s+=c;
             };
             return s;
         }
@@ -41,7 +43,15 @@
             return n;
         }
 
-        
+        function getInt64(offset){
+
+            var a=parseInt("0x"+getHexString(offset,4));
+            var b=parseInt("0x"+getHexString(offset+4,4));
+                        
+            var e=(a >> 52 - 32 & 0x7ff) - 1023;
+            var x=(a & 0xfffff | 0x100000) * 1.0 / Math.pow(2,52-32) * Math.pow(2, e) + b * 1.0 / Math.pow(2, 52) * Math.pow(2, e);
+            return x;
+        }
         
         function readBinary(){
             var offset_table=new Array();
@@ -78,9 +88,11 @@
                         break;
                     case 0x30: // TYPE_DATE
                         // time ref from 978307200
-                        console.log("TODO: TYPE_DATE");
-
-                        break;
+                        var x=getInt64(offset);
+                        var timestamp=x+9.783072e8;
+                        var date = new Date(timestamp*1000);
+                        
+                        return date;
                         
                     case 0x40: // TYPE_DATA
                         console.log("TODO: TYPE_DATA");

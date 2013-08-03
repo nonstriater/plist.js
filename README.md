@@ -2,6 +2,21 @@
 
 ### 欢迎大家贡献代码, 我不太会写JS
 
+### 用法
+
+
+`<script type="text/javascript" src="plist.js"></script>`
+
+```
+//f参数为File对象
+getPlist(f,function(obj){
+          console.log(obj);
+});
+
+
+```
+
+
 ### TODO
 1. 支持数据类型: 浮点数, 日期, 二进制, UID
 2. 支持XML格式plist
@@ -13,7 +28,7 @@
 
 ----
 
-Apple Plist格式 有2中: XML格式 和 二进制格式(bplist, Binary Plist). 搜了一下没有太官方的文档说明二进制格式的描述,只有在苹果开源代码文件的注释里头[提到](http://opensource.apple.com/source/CF/CF-550/CFBinaryPList.c), 我仔细研究了一下,也参考了[Node.js代码](https://gist.github.com/clee/1007217)和[Python代码](https://github.com/farcaller/bplist-python/blob/master/bplist.py)中的解析过程,把具体格式做下说明,如果有不对的请*立即指正*以免误导大家.
+Apple Plist格式 有2种: XML格式 和 二进制格式(bplist, Binary Plist). 搜了一下没有太官方的文档说明二进制格式的描述,只有在苹果开源代码文件的注释里头[提到](http://opensource.apple.com/source/CF/CF-550/CFBinaryPList.c), 我仔细研究了一下,也参考了[Node.js代码](https://gist.github.com/clee/1007217)和[Python代码](https://github.com/farcaller/bplist-python/blob/master/bplist.py)中的解析过程,把具体格式做下说明,如果有不对的请*立即指正*以免误导大家.
 
 ### 文件结构
 注: T,K,L,M,N在文件尾的解释中有说明
