@@ -46,8 +46,12 @@
         function getInt64(offset){
 
             var a=parseInt("0x"+getHexString(offset,4));
+
             var b=parseInt("0x"+getHexString(offset+4,4));
-                        
+            
+            if (a=="0x00000000"){
+                return b;
+            }        
             var e=(a >> 52 - 32 & 0x7ff) - 1023;
             var x=(a & 0xfffff | 0x100000) * 1.0 / Math.pow(2,52-32) * Math.pow(2, e) + b * 1.0 / Math.pow(2, 52) * Math.pow(2, e);
             return x;
@@ -152,9 +156,9 @@
             
             L=getInt(buffer.length-32+6,1);
             M=getInt(buffer.length-32+7,1);
-            N=getInt(buffer.length-32+8,8);
-            T=getInt(buffer.length-32+16,8);
-            K=getInt(buffer.length-32+24,8);
+            N=getInt64(buffer.length-32+8);
+            T=getInt64(buffer.length-32+16);
+            K=getInt64(buffer.length-32+24);
             
             console.log("L,M,N,T,K",L,M,N,T,K);
 
