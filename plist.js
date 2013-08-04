@@ -88,7 +88,8 @@
                         return getInt(offset,l);
                         
                     case 0x20: // TYPE_REAL
-                        console.log("TODO: TYPE_REAL");
+                        
+
                         break;
                     case 0x30: // TYPE_DATE
                         // time ref from 978307200
@@ -99,8 +100,11 @@
                         return date;
                         
                     case 0x40: // TYPE_DATA
-                        console.log("TODO: TYPE_DATA");
-                        break;
+                        console.log("TODO: Test This");
+                        var uint8Array  = buffer.subarry(offset,type_size);
+                        var arrayBuffer = uint8Array.buffer;
+                        var blob        = new Blob([arrayBuffer]);
+                        return blob;
 
                     case 0x50: // TYPE_STRING_ASCII
                         return getString(offset,type_size);
