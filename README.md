@@ -9,11 +9,10 @@ This is a JS tool to parse BOTH Binary & XML format Plist files
 `<script type="text/javascript" src="plist.js"></script>`
 
 ```
-//f参数为File对象
+//f参数为File或Blob对象
 getPlist(f,function(obj){
           console.log(obj);
 });
-
 
 ```
 
@@ -21,8 +20,7 @@ getPlist(f,function(obj){
 ### TODO
 
 1. 测试Data类型
-2. 在Chrome, Firefox测试
-3. 支持XML格式plist
+2. 在Chrome, Firefox, IE测试
 
 ----
 
@@ -148,3 +146,7 @@ val[0]=02, 表示偏移表02指向它的值
 0x5A 说明这是个ASCII字符串. A表示长度为10个字节: 4D 69 6E 64 52 65 61 64 65 72 这在ASCII编码中代表的是:"MindReader" 所以我们得到了key是MindReader 剩下的value也用类似的方法可以得到了,哎0xD5 又是一个嵌套的字典... 
 
 ```
+
+
+### 感谢
+用到了 [jquery-plist](https://github.com/erisdiscord/jquery-plist)中的部分代码来解析XML格式Plist 

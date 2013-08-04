@@ -1,5 +1,108 @@
 (function (window) {
 
+    function XMLPlist(file,callback) {
+        console.log('Start XML Parser');
+        var DATE_RE = /(\d\d\d\d)-(\d\d)-(\d\d)(?:T|\s+)(\d\d):(\d\d):(\d\d)\s*(?:Z|([-+])([0-9]{2}):?([0-9]{2}))?/;
+        
+        function parseDate(str) {
+            var m      = str.match(DATE_RE);
+            var date   = new Date(0);
+            var offset = 0;
+            
+            if ( m[1] != null ) date.setUTCFullYear( parseInt(m[1])     );
+            if ( m[2] != null ) date.setUTCMonth(    parseInt(m[2]) - 1 );
+            if ( m[3] != null ) date.setUTCDate(     parseInt(m[3])     );
+            if ( m[4] != null ) date.setUTCHours(    parseInt(m[4])     );
+            if ( m[5] != null ) date.setUTCMinutes(  parseInt(m[5])     );
+            if ( m[6] != null ) date.setUTCSeconds(  parseInt(m[6])     );
+            
+            if ( m[7] != null && m[8] != null && m[9] != null ) {
+                var sign = (m[7] == '-') ? -1 : +1;
+                var hOff = parseInt(m[8]);
+                var mOff = parseInt(m[9]);
+                offset = (hOff * 60 + mOff) * 60 * 1000
+            }
+            
+            return new Date( Number(date) + offset );
+        }
+        
+        function parseDict(nodes) {
+
+            var dict = { };
+            for ( var i = 0; i < nodes.length; i += 2 ) {
+                var keyNode   = nodes[i],
+                    valueNode = nodes[i + 1];
+                
+                // sanity check to make sure this is actually a key
+                if (keyNode.nodeName == 'key')
+                    dict[keyNode.textContent] = parse(valueNode);                
+            }
+            
+            return dict;
+        }
+        
+        function parseArray(nodes) {
+            var array = [ ];
+            for (var i = 0; i < nodes.length; i++) {
+               array[i] = parse(nodes[i]);
+            };
+            
+            return array;
+        }
+        function getNodes(node){
+                console.log('get nodes:',node);
+                var nodes=node.childNodes;
+                var nds=[];
+                for (var i = 0; i < nodes.length; i++) {
+                    var n=nodes[i];
+                    if (n.nodeName!='#text') nds.push(n);
+
+                };
+                return nds;
+        }
+
+        function parse(node) {
+            
+            switch ( node.nodeName ) {
+
+                case 'dict'   : return parseDict(getNodes(node));
+                case 'array'  : return parseArray(getNodes(node));
+                case 'string' : return node.textContent;
+                case 'number' : return parseFloat(node.textContent);
+                case 'real'   : return parseFloat(node.textContent);
+                case 'integer': return parseInt(node.textContent);
+                case 'date'   : return parseDate(node.textContent);
+                case 'true'   : return true;
+                case 'false'  : return false;
+                
+                default:
+                    throw "Unable to deserialize " + node.nodeName;
+            }
+        }
+        
+        var reader = new FileReader();
+        reader.onload = function (evt) {
+           
+
+            var xmlDoc;  
+            if(!window.ActiveXObject){  
+                var parser = new DOMParser();  
+                xmlDoc = parser.parseFromString(reader.result,"text/xml");  
+            }else{  
+                xmlDoc = new ActiveXObject("Microsoft.XMLDOM");  
+                xmlDoc.async="false";  
+                xmlDoc.load(reader.result);  
+            } 
+            var xml=xmlDoc.documentElement;
+
+            xml=getNodes(xml)[0];
+            callback(parse(xml));
+        }
+
+        reader.readAsText(file);
+    }
+
+
     function Plist(file,callback) {
         var that = this,buffer;
 
@@ -42,7 +145,6 @@
             };
             return n;
         }
-
         function getBigEndian(offset,length){
             var a,sa;
             if (length<4) {
@@ -79,7 +181,6 @@
                 return NaN;
             }
         }
-
         function readBinary(){
             var offset_table=new Array();
             var L,M,N,T,K;
@@ -200,7 +301,7 @@
         }
 
         function readXML(){
-            console.log('Start XML Parser');
+            XMLPlist(file,callback);
         }
 
         function init() {
