@@ -1,4 +1,5 @@
 ##这是一个纯JS写的解析Apple Plist格式的工具
+This is a JS tool to parse BOTH Binary & XML format Plist files
 
 ### 欢迎大家贡献代码, 我不太会写JS
 
@@ -18,13 +19,10 @@ getPlist(f,function(obj){
 
 
 ### TODO
-1. 支持数据类型: 浮点数, 日期, 二进制, UID
-2. 支持XML格式plist
-3. 在Chrome, Firefox测试
 
-
-### DONE
-支持整数,中英文字符串,数字,字典等 满足最基本的需求, 可以读iOS app的Info.plist
+1. 测试Data类型
+2. 在Chrome, Firefox测试
+3. 支持XML格式plist
 
 ----
 

@@ -43,20 +43,43 @@
             return n;
         }
 
-        function getInt64(offset){
+        function getBigEndian(offset,length){
+            var a,sa;
+            if (length<4) {
+                //padding
+                sa=getHexString(offset,length);
+                for (var i = 0; i < 4-length; i++) {
+                    sa="00"+sa;
+                };
+                length=4;
+            }else {
+                sa=getHexString(offset,4);
+            }
 
-            var a=parseInt("0x"+getHexString(offset,4));
-
-            var b=parseInt("0x"+getHexString(offset+4,4));
-            
-            if (a=="0x00000000"){
-                return b;
-            }        
+            a=parseInt("0x"+sa);
             var e=(a >> 52 - 32 & 0x7ff) - 1023;
-            var x=(a & 0xfffff | 0x100000) * 1.0 / Math.pow(2,52-32) * Math.pow(2, e) + b * 1.0 / Math.pow(2, 52) * Math.pow(2, e);
-            return x;
+            var ia=(a & 0xfffff | 0x100000) * 1.0 / Math.pow(2,52-32) * Math.pow(2, e) ;
+            
+            if (length==4) {
+                //Float32
+
+                return ia;
+
+            }else if (length==8) {
+                //Float32
+
+                var b=parseInt("0x"+getHexString(offset+4,4));
+                if (a==0) {
+                    return b;
+                };
+                
+                return ia+b * 1.0 / Math.pow(2, 52) * Math.pow(2, e);
+            }else{
+                console.log('Not support Float length',length);
+                return NaN;
+            }
         }
-        
+
         function readBinary(){
             var offset_table=new Array();
             var L,M,N,T,K;
@@ -84,16 +107,21 @@
                         }
                         
                     case 0x10: // TYPE_INT
-                        var l=Math.pow(2,(type & 0x0f));
+                        
+                        var l=Math.pow(2,type_size);
                         return getInt(offset,l);
                         
-                    case 0x20: // TYPE_REAL
                         
-
-                        break;
+                        
+                        
+                    case 0x20: // TYPE_REAL
+                        var l=Math.pow(2,type_size);
+                        var f=getBigEndian(offset,l);
+                        
+                        return f;
                     case 0x30: // TYPE_DATE
                         // time ref from 978307200
-                        var x=getInt64(offset);
+                        var x=getBigEndian(offset,8);
                         var timestamp=x+9.783072e8;
                         var date = new Date(timestamp*1000);
                         
@@ -101,20 +129,17 @@
                         
                     case 0x40: // TYPE_DATA
                         console.log("TODO: Test This");
-                        var uint8Array  = buffer.subarry(offset,type_size);
+                        var uint8Array  = buffer.subarry(offset,offset+type_size);
                         var arrayBuffer = uint8Array.buffer;
                         var blob        = new Blob([arrayBuffer]);
                         return blob;
 
+                    case 0x80: // TYPE_UID
                     case 0x50: // TYPE_STRING_ASCII
                         return getString(offset,type_size);
 
                     case 0x60: // TYPE_STRING_UNICODE
                         return getString(offset,type_size,true);
-
-                    case 0x80: // TYPE_UID
-                        console.log("TODO: TYPE_UID");
-                        break;
                         
                     case 0xA0: // TYPE_ARRAY
                     case 0xC0: // TYPE_SET
@@ -160,9 +185,9 @@
             
             L=getInt(buffer.length-32+6,1);
             M=getInt(buffer.length-32+7,1);
-            N=getInt64(buffer.length-32+8);
-            T=getInt64(buffer.length-32+16);
-            K=getInt64(buffer.length-32+24);
+            N=getBigEndian(buffer.length-32+8,8);
+            T=getBigEndian(buffer.length-32+16,8);
+            K=getBigEndian(buffer.length-32+24,8);
             
             console.log("L,M,N,T,K",L,M,N,T,K);
 
